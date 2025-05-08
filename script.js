@@ -460,31 +460,71 @@
         setTimeout(() => {
             preloader.style.opacity = '0';
             preloader.addEventListener('transitionend', () => {
-                preloader.classList.add('tw-hidden');
+                preloader.classList.add('tw-hidden'); // This hides the preloader
+
+                // appContainer should now be part of the layout (due to HTML fix)
+                // but initially transparent (due to CSS).
+                // Add 'tw-visible' to trigger its fade-in animation.
                 appContainer.classList.add('tw-visible');
                 
                 playAmbientSound();
                 updateStageDisplay();
                 logToConsole('initiation', 'Chronos Tesseract Interface Initialized. System Standby.');
                 
-                // Set canvas size after app container is visible
-                if (particleCanvas.offsetWidth > 0 && particleCanvas.offsetHeight > 0) {
-                    initParticles();
-                    animateParticles();
-                } else {
-                    // Fallback if canvas size is not yet available (e.g., hidden parent)
-                    // This might happen if tw-visible transition is too slow or display:none related issues
-                    setTimeout(() => {
-                        if (particleCanvas.offsetWidth > 0 && particleCanvas.offsetHeight > 0) {
-                           initParticles();
-                           animateParticles();
-                        } else {
-                            console.warn("Particle canvas dimensions still zero after delay.");
+                // Function to setup canvas, to be called when ready
+                const setupCanvas = () => {
+                    if (particleCanvas.offsetWidth > 0 && particleCanvas.offsetHeight > 0) {
+                        if (particlesArray.length === 0) { // Only init if not already done
+                            initParticles();
+                            animateParticles();
                         }
-                    }, 100); // Short delay to wait for CSS to apply
-                }
+                    } else {
+                        console.warn("Particle canvas dimensions zero. Check CSS for #tw-app-container and #tw-tesseract-visualization visibility and sizing.");
+                    }
+                };
 
-            }, { once: true });
+                // The appContainer's 'tw-visible' class triggers a transition.
+                // We should ideally initialize the canvas after this transition ensures
+                // the container has its final dimensions.
+                let canvasSetupAttempted = false;
+
+                const attemptCanvasSetup = () => {
+                    if (!canvasSetupAttempted) {
+                        setupCanvas();
+                        canvasSetupAttempted = true; // Mark as attempted
+                    }
+                };
+                
+                // Listen for the end of the appContainer's fade-in transition
+                appContainer.addEventListener('transitionend', function onAppContainerReady(event) {
+                    // Ensure this event is for the opacity or transform transition on appContainer itself
+                    if (event.target === appContainer && (event.propertyName === 'opacity' || event.propertyName === 'transform')) {
+                        attemptCanvasSetup();
+                        // Clean up listener if we're sure this is the one we want
+                        // appContainer.removeEventListener('transitionend', onAppContainerReady); // Be careful if other transitions exist
+                    }
+                });
+
+                // As a robust fallback, also try after a delay slightly longer than the transition duration,
+                // in case the transitionend event doesn't fire as expected or is missed.
+                const appContainerTransitionDuration = parseFloat(getComputedStyle(appContainer).transitionDuration) * 1000 || 800; // 800ms from CSS
+                setTimeout(() => {
+                    if (!canvasSetupAttempted) { // If transitionend didn't trigger setup
+                        console.warn("Canvas setup fallback triggered after transition duration.");
+                        attemptCanvasSetup();
+                    }
+                }, appContainerTransitionDuration + 100); // A little buffer
+
+                // Initial attempt, in case dimensions are available sooner (e.g. if no conflicting display properties)
+                // requestAnimationFrame ensures layout is stable before measuring
+                requestAnimationFrame(() => {
+                    if (particleCanvas.offsetWidth > 0 && particleCanvas.offsetHeight > 0 && !canvasSetupAttempted) {
+                        attemptCanvasSetup();
+                    }
+                });
+
+
+            }, { once: true }); // Ensure preloader transitionend fires only once
         }, 1500); // Simulate asset loading / preloader duration
     }
 
