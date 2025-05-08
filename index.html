@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chronos Tesseract - Navigate the Hyperweb</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Orbitron for titles, Rajdhani for text -->
+</head>
+<body>
+    <div id="tw-preloader">
+        <div class="tw-preloader-cube">
+            <div class="tw-preloader-face tw-front"></div>
+            <div class="tw-preloader-face tw-back"></div>
+            <div class="tw-preloader-face tw-right"></div>
+            <div class="tw-preloader-face tw-left"></div>
+            <div class="tw-preloader-face tw-top"></div>
+            <div class="tw-preloader-face tw-bottom"></div>
+        </div>
+        <p>Calibrating Dimensions...</p>
+    </div>
+
+    <div id="tw-app-container" class="tw-hidden">
+        <header class="tw-header">
+            <h1>The Chronos Tesseract</h1>
+            <p class="tw-subtitle">Unlock a Glimpse into the Infinite Hyperweb</p>
+        </header>
+
+        <main class="tw-main-content">
+            <div id="tw-tesseract-visualization">
+                <!-- This will be where the main tesseract visual is rendered or animated -->
+                <div class="tw-tesseract-outer-shell">
+                    <div class="tw-tesseract-inner-cube" id="tw-inner-cube">
+                        <!-- We can represent facets or nodes here -->
+                        <div class="tw-node" data-node-id="1"></div>
+                        <div class="tw-node" data-node-id="2"></div>
+                        <div class="tw-node" data-node-id="3"></div>
+                        <div class="tw-node" data-node-id="4"></div>
+                        <div class="tw-node" data-node-id="5"></div>
+                        <div class="tw-node" data-node-id="6"></div>
+                        <div class="tw-node" data-node-id="7"></div>
+                        <div class="tw-node" data-node-id="8"></div>
+                    </div>
+                    <!-- Lines connecting nodes could be added via JS/CSS -->
+                </div>
+                <canvas id="tw-particle-canvas"></canvas>
+            </div>
+
+            <div id="tw-interaction-panel">
+                <section id="tw-stage-initiation" class="tw-stage current-stage">
+                    <h2>Stage 1: Attunement</h2>
+                    <p class="tw-instruction-text">The Tesseract slumbers. Awaken its core to begin the dimensional alignment sequence.</p>
+                    <button id="tw-initiate-button" class="tw-button">Awaken Core</button>
+                    <div class="tw-console-output" id="tw-console-initiation">
+                        <p>> System standby...</p>
+                    </div>
+                </section>
+
+                <section id="tw-stage-alignment" class="tw-stage">
+                    <h2>Stage 2: Dimensional Calibration</h2>
+                    <p class="tw-instruction-text">Calibrate the dimensional stabilizers. Activate the 8 primary reality anchors (glowing nodes on the tesseract).</p>
+                    <div id="tw-anchor-status">
+                        Anchors Activated: <span id="tw-anchors-activated-count">0</span> / 8
+                    </div>
+                    <div class="tw-console-output" id="tw-console-alignment">
+                        <p>> Awaiting anchor calibration...</p>
+                    </div>
+                </section>
+
+                <section id="tw-stage-focus" class="tw-stage">
+                    <h2>Stage 3: Quantum Entanglement</h2>
+                    <p class="tw-instruction-text">The anchors are set. Now, focus the Tesseract's energy matrix. Maintain resonant frequency.</p>
+                    <div id="tw-focus-charge-container">
+                        <div id="tw-focus-charge-bar"></div>
+                    </div>
+                    <p>Resonance Stability: <span id="tw-resonance-stability">0%</span></p>
+                    <button id="tw-focus-energy-button" class="tw-button" disabled>Channel Energy</button>
+                    <div class="tw-console-output" id="tw-console-focus">
+                        <p>> Energy matrix offline...</p>
+                    </div>
+                </section>
+
+                <section id="tw-stage-leap" class="tw-stage">
+                    <h2>Stage 4: The Hyper-Leap</h2>
+                    <p class="tw-instruction-text">All systems nominal. The gateway is stabilizing. Prepare for extradimensional transit.</p>
+                    <button id="tw-leap-button" class="tw-button" disabled>Initiate Hyper-Leap</button>
+                    <div class="tw-console-output" id="tw-console-leap">
+                        <p>> Trajectory computation pending...</p>
+                    </div>
+                    <p id="tw-countdown-timer"></p>
+                </section>
+            </div>
+        </main>
+
+        <footer class="tw-footer">
+            <p>Chronos Tesseract v1.0 - For Exploratory Purposes Only. Destination Unknown.</p>
+            <p>WARNING: Exposure to raw hyper-reality may cause existential disorientation.</p>
+        </footer>
+
+        <!-- Audio Elements for UI sounds -->
+        <audio id="tw-audio-click" src="sounds/click.mp3" preload="auto"></audio>
+        <audio id="tw-audio-activate" src="sounds/activate.mp3" preload="auto"></audio>
+        <audio id="tw-audio-charge" src="sounds/charge.mp3" preload="auto" loop></audio>
+        <audio id="tw-audio-warp" src="sounds/warp.mp3" preload="auto"></audio>
+        <audio id="tw-audio-ambient" src="sounds/ambient.mp3" preload="auto" loop></audio>
+        <!-- Note: You'll need to find/create these sound files -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
