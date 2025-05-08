@@ -1,0 +1,523 @@
+/* style.css */
+
+:root {
+    --primary-color: #00f2ff; /* Bright cyan for highlights */
+    --secondary-color: #9700ff; /* Purple for accents */
+    --background-color: #08001b; /* Deep dark blue/purple */
+    --surface-color: rgba(10, 2, 30, 0.8); /* Slightly transparent dark surface */
+    --text-color: #e0e0e0;
+    --text-muted-color: #a0a0a0;
+    --glow-color: rgba(0, 242, 255, 0.7);
+    --glow-color-secondary: rgba(151, 0, 255, 0.6);
+    --border-color: rgba(0, 242, 255, 0.3);
+
+    --font-title: 'Orbitron', sans-serif;
+    --font-text: 'Rajdhani', sans-serif;
+
+    --tesseract-size: 200px; /* Base size for the tesseract visual */
+    --node-size: 20px;
+}
+
+/* --- Basic Reset & Global Styles --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px; /* Base font size */
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-text);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scrollbars */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0),
+        radial-gradient(circle at 10px 10px, rgba(255,255,255,0.03) 1px, transparent 0);
+    background-size: 20px 20px; /* Subtle grid background */
+}
+
+/* --- Preloader Styles --- */
+#tw-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease-out;
+}
+
+.tw-preloader-cube {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: preload-rotate 8s infinite linear;
+}
+
+.tw-preloader-face {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--primary-color);
+    background-color: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+.tw-preloader-face.tw-front  { transform: translateZ(30px); }
+.tw-preloader-face.tw-back   { transform: rotateY(180deg) translateZ(30px); }
+.tw-preloader-face.tw-right  { transform: rotateY(90deg) translateZ(30px); }
+.tw-preloader-face.tw-left   { transform: rotateY(-90deg) translateZ(30px); }
+.tw-preloader-face.tw-top    { transform: rotateX(90deg) translateZ(30px); }
+.tw-preloader-face.tw-bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+#tw-preloader p {
+    margin-top: 20px;
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 5px var(--glow-color);
+    animation: pulse-text 2s infinite ease-in-out;
+}
+
+@keyframes preload-rotate {
+    0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); }
+}
+
+@keyframes pulse-text {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* --- App Container & Layout --- */
+#tw-app-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0; /* Initially hidden, shown by JS */
+    transform: translateY(20px); /* Slight upward animation on load */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+#tw-app-container.tw-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tw-hidden {
+    display: none !important;
+}
+
+.tw-header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.tw-header h1 {
+    font-family: var(--font-title);
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--glow-color);
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.tw-header .tw-subtitle {
+    font-family: var(--font-text);
+    font-size: 1.1rem;
+    color: var(--text-muted-color);
+    font-weight: 300;
+}
+
+.tw-main-content {
+    display: flex;
+    flex-direction: row; /* Default for wider screens */
+    gap: 30px;
+    width: 100%;
+}
+
+/* --- Tesseract Visualization --- */
+#tw-tesseract-visualization {
+    flex: 2; /* Takes more space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px; /* Ensure space for tesseract */
+    perspective: 1000px; /* Essential for 3D effect */
+    position: relative; /* For canvas positioning */
+}
+
+#tw-particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Behind the tesseract DOM elements */
+}
+
+.tw-tesseract-outer-shell {
+    width: var(--tesseract-size);
+    height: var(--tesseract-size);
+    position: relative;
+    transform-style: preserve-3d;
+    animation: tesseract-rotate 120s infinite linear; /* Slow majestic rotation */
+}
+
+.tw-tesseract-inner-cube {
+    width: calc(var(--tesseract-size) * 0.5);
+    height: calc(var(--tesseract-size) * 0.5);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg); /* Centered */
+    animation: tesseract-inner-rotate 60s infinite linear reverse; /* Counter-rotation or different speed */
+}
+
+/* Creating cube faces (simplified for the shell, more detailed for nodes) */
+.tw-tesseract-outer-shell::before, .tw-tesseract-outer-shell::after,
+.tw-tesseract-inner-cube::before, .tw-tesseract-inner-cube::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--primary-color);
+    box-shadow: inset 0 0 10px var(--glow-color), 0 0 10px var(--glow-color);
+    opacity: 0.3;
+}
+/* Outer Shell 'ghost' faces for visual depth */
+.tw-tesseract-outer-shell::before { transform: translateZ(calc(var(--tesseract-size) / 2)); }
+.tw-tesseract-outer-shell::after { transform: translateZ(calc(var(--tesseract-size) / -2)); }
+/* Inner Cube 'ghost' faces */
+.tw-tesseract-inner-cube::before { transform: translateZ(calc(var(--tesseract-size) * 0.25)); }
+.tw-tesseract-inner-cube::after { transform: translateZ(calc(var(--tesseract-size) * -0.25)); }
+
+.tw-node {
+    position: absolute;
+    width: var(--node-size);
+    height: var(--node-size);
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--glow-color-secondary), 0 0 15px var(--glow-color-secondary);
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d; /* If nodes themselves have 3D aspects */
+}
+
+.tw-node:hover {
+    transform: scale(1.3);
+    background-color: var(--primary-color);
+    box-shadow: 0 0 12px var(--glow-color), 0 0 20px var(--glow-color);
+}
+
+.tw-node.activated {
+    background-color: var(--primary-color);
+    box-shadow: 0 0 15px var(--glow-color), 0 0 30px var(--glow-color), inset 0 0 5px #fff;
+    animation: pulse-node 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-node {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Node positioning (8 corners of the inner cube) */
+/* This needs JavaScript to dynamically position them correctly in 3D space relative to inner cube,
+   but here's a static approximation if inner-cube is not rotating too wildly or if nodes are on a fixed frame.
+   For true tesseract representation, JS will place these.
+   For simplicity here, we place them on the faces of the inner cube.
+*/
+/* Example placements (will be refined by JS) */
+.tw-node[data-node-id="1"] { top: 0; left: 0; transform: translate(-50%, -50%) translateZ(calc(var(--tesseract-size) * 0.25)); }
+.tw-node[data-node-id="2"] { top: 0; right: 0; transform: translate(50%, -50%) translateZ(calc(var(--tesseract-size) * 0.25)); }
+.tw-node[data-node-id="3"] { bottom: 0; left: 0; transform: translate(-50%, 50%) translateZ(calc(var(--tesseract-size) * 0.25)); }
+.tw-node[data-node-id="4"] { bottom: 0; right: 0; transform: translate(50%, 50%) translateZ(calc(var(--tesseract-size) * 0.25)); }
+.tw-node[data-node-id="5"] { top: 0; left: 0; transform: translate(-50%, -50%) translateZ(calc(var(--tesseract-size) * -0.25)); }
+.tw-node[data-node-id="6"] { top: 0; right: 0; transform: translate(50%, -50%) translateZ(calc(var(--tesseract-size) * -0.25)); }
+.tw-node[data-node-id="7"] { bottom: 0; left: 0; transform: translate(-50%, 50%) translateZ(calc(var(--tesseract-size) * -0.25)); }
+.tw-node[data-node-id="8"] { bottom: 0; right: 0; transform: translate(50%, 50%) translateZ(calc(var(--tesseract-size) * -0.25)); }
+
+
+@keyframes tesseract-rotate {
+    0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+
+@keyframes tesseract-inner-rotate {
+    0% { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    100% { transform: translate(-50%, -50%) rotateX(-360deg) rotateY(360deg) rotateZ(-360deg); }
+}
+
+
+/* --- Interaction Panel --- */
+#tw-interaction-panel {
+    flex: 1.5; /* Takes less space than visualizer */
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3), 0 0 15px var(--glow-color-secondary) inset;
+    backdrop-filter: blur(5px); /* Frosted glass effect if supported */
+    max-height: 70vh; /* prevent panel from becoming too tall */
+    overflow-y: auto; /* scroll if content overflows */
+}
+
+.tw-stage {
+    display: none; /* Hidden by default, JS shows current stage */
+    animation: fadeInStage 0.5s ease-out;
+}
+
+.tw-stage.current-stage {
+    display: block;
+}
+
+@keyframes fadeInStage {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#tw-interaction-panel h2 {
+    font-family: var(--font-title);
+    color: var(--primary-color);
+    text-shadow: 0 0 5px var(--glow-color);
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 10px;
+    font-size: 1.6rem;
+}
+
+.tw-instruction-text {
+    font-size: 1rem;
+    color: var(--text-muted-color);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.tw-button {
+    display: inline-block;
+    font-family: var(--font-title);
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 12px 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 4px;
+    margin-top: 10px;
+    text-shadow: 0 0 3px var(--glow-color);
+}
+
+.tw-button:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    box-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--glow-color);
+}
+
+.tw-button:disabled {
+    border-color: var(--text-muted-color);
+    color: var(--text-muted-color);
+    cursor: not-allowed;
+    text-shadow: none;
+}
+
+.tw-console-output {
+    background-color: rgba(0,0,0,0.3);
+    border: 1px solid rgba(var(--primary-color-rgb, 0, 242, 255), 0.2); /* Use RGB for opacity on border */
+    padding: 15px;
+    margin-top: 20px;
+    min-height: 80px;
+    max-height: 200px; /* Prevent it from growing too large */
+    overflow-y: auto;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace; /* Monospace for console feel */
+    font-size: 0.9rem;
+}
+/* For console scrolling effect */
+.tw-console-output p {
+    margin-bottom: 5px;
+    word-break: break-all; /* Prevent long strings from breaking layout */
+}
+.tw-console-output p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- Specific Stage Elements --- */
+#tw-anchor-status {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+#tw-anchors-activated-count {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+#tw-focus-charge-container {
+    width: 100%;
+    height: 30px;
+    background-color: rgba(0,0,0,0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    overflow: hidden; /* To contain the charge bar */
+}
+
+#tw-focus-charge-bar {
+    width: 0%; /* Controlled by JS */
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    box-shadow: 0 0 10px var(--glow-color), 0 0 5px var(--glow-color-secondary) inset;
+    transition: width 0.2s linear; /* Smooth charge animation */
+}
+
+#tw-resonance-stability {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+#tw-countdown-timer {
+    font-family: var(--font-title);
+    font-size: 2rem;
+    color: var(--primary-color);
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 0 0 10px var(--glow-color);
+}
+
+
+/* --- Footer --- */
+.tw-footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 1200px;
+}
+
+.tw-footer p {
+    font-size: 0.8rem;
+    color: var(--text-muted-color);
+    margin-bottom: 5px;
+}
+.tw-footer p:first-child {
+    font-family: var(--font-text);
+    font-weight: 600;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 900px) {
+    .tw-main-content {
+        flex-direction: column; /* Stack visualizer and panel */
+        align-items: center;
+    }
+
+    #tw-tesseract-visualization {
+        min-height: 300px; /* Reduce height on smaller screens */
+        width: 100%;
+        margin-bottom: 30px;
+    }
+    :root {
+        --tesseract-size: 160px; /* Smaller tesseract */
+        --node-size: 15px;
+    }
+
+    #tw-interaction-panel {
+        width: 100%;
+        max-width: 500px; /* Limit width of panel */
+        max-height: none; /* Allow it to grow taller */
+    }
+
+    .tw-header h1 {
+        font-size: 2.2rem;
+    }
+    .tw-header .tw-subtitle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px; /* Add some padding to body on small screens */
+    }
+    #tw-app-container {
+        padding: 10px;
+    }
+    .tw-header h1 {
+        font-size: 1.8rem;
+    }
+    #tw-interaction-panel h2 {
+        font-size: 1.4rem;
+    }
+    .tw-button {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+        width: 100%; /* Full width buttons on small screens */
+        margin-bottom: 10px;
+    }
+    :root {
+        --tesseract-size: 120px;
+    }
+    #tw-tesseract-visualization {
+        min-height: 250px;
+    }
+    .tw-footer p {
+        font-size: 0.7rem;
+    }
+}
+
+/* Helper for JS: to use CSS variables in JS easily */
+body::before {
+    content: '--primary-color-rgb: ' get-css-variable-value(--primary-color); /* Example for JS to parse if needed */
+    display: none;
+}
+
+/* This technique of getting RGB from hex/named color is tricky in pure CSS.
+   If JS needs RGB values from CSS vars, it's easier for JS to compute them after reading the var.
+   The above is more a placeholder concept.
+   I've updated the console output border to use rgba directly with the color values.
+*/
+:root {
+    /* Define RGB components for colors if needed for complex RGBA opacity later, e.g., in JS or for specific properties */
+    /* For example, if --primary-color is #00f2ff */
+    --primary-color-r: 0;
+    --primary-color-g: 242;
+    --primary-color-b: 255;
+}
+/* Example usage for border with opacity:
+   border: 1px solid rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.2);
+*/
+/* Updated console output border to use this concept: */
+.tw-console-output {
+    border: 1px solid rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.2);
+}
